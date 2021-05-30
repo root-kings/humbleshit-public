@@ -1,123 +1,128 @@
 const routes = [
   {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    path: "/",
+    component: () => import("layouts/MainLayout.vue"),
     children: [
       {
-        path: '',
-        redirect: '/home'
+        path: "",
+        redirect: "/home",
       },
       {
-        path: 'about',
-        component: () => import('pages/About.vue')
+        path: "about",
+        component: () => import("pages/About.vue"),
       },
       {
-        name: 'home',
-        path: 'home',
-        component: () => import('pages/Index.vue')
+        name: "home",
+        path: "home",
+        component: () => import("pages/Index.vue"),
       },
       {
-        name: 'menu',
-        path: 'menu',
-        component: () => import('pages/Menu.vue')
+        name: "menu",
+        path: "menu",
+        component: () => import("pages/Menu.vue"),
       },
       {
-        name: 'parameters',
-        path: 'parameters',
-        component: () => import('pages/Parameters.vue')
+        name: "parameters",
+        path: "parameters",
+        component: () => import("pages/Parameters.vue"),
       },
       {
-        name: 'userfeedback',
-        path: 'userfeedback',
-        component: () => import('pages/UserFeedback.vue')
+        name: "userfeedback",
+        path: "userfeedback",
+        component: () => import("pages/UserFeedback.vue"),
       },
       {
-        name: 'sadfeedback',
-        path: 'sadfeedback',
-        component: () => import('src/pages/SadFeedback.vue')
+        name: "sadfeedback",
+        path: "sadfeedback",
+        component: () => import("src/pages/SadFeedback.vue"),
       },
       {
-        path: 'staff',
-        component: () => import('pages/Staff.vue')
+        name: "happyfeedback",
+        path: "happyfeedback",
+        component: () => import("src/pages/HappyFeedback.vue"),
       },
       {
-        path: 'staff/:id',
-        component: () => import('pages/StaffProfile.vue'),
-        props: true
+        path: "staff",
+        component: () => import("pages/Staff.vue"),
       },
       {
-        path: 'facilities',
-        component: () => import('pages/Facilities.vue')
+        path: "staff/:id",
+        component: () => import("pages/StaffProfile.vue"),
+        props: true,
       },
       {
-        path: 'facilities/:id',
-        component: () => import('pages/Facility.vue'),
-        props: true
+        path: "facilities",
+        component: () => import("pages/Facilities.vue"),
       },
       {
-        path: 'shifts',
-        component: () => import('pages/Shifts.vue')
+        path: "facilities/:id",
+        component: () => import("pages/Facility.vue"),
+        props: true,
       },
       {
-        path: 'shifts/:id',
-        component: () => import('pages/ShiftDetails.vue'),
-        props: true
+        path: "shifts",
+        component: () => import("pages/Shifts.vue"),
       },
       {
-        path: 'tickets/overview',
-        component: () => import('pages/TicketsOverview.vue'),
-        props: true
+        path: "shifts/:id",
+        component: () => import("pages/ShiftDetails.vue"),
+        props: true,
       },
       {
-        path: 'tickets/by-parameter/:id',
-        component: () => import('pages/TicketsByParameter.vue'),
-        props: true
+        path: "tickets/overview",
+        component: () => import("pages/TicketsOverview.vue"),
+        props: true,
       },
       {
-        path: 'reports/facilities',
-        component: () => import('pages/ReportFacilities.vue'),
-        props: true
+        path: "tickets/by-parameter/:id",
+        component: () => import("pages/TicketsByParameter.vue"),
+        props: true,
       },
       {
-        path: 'reports/checklist',
-        component: () => import('pages/ReportChecklist.vue'),
-        props: true
+        path: "reports/facilities",
+        component: () => import("pages/ReportFacilities.vue"),
+        props: true,
       },
       {
-        path: 'reports/details',
-        component: () => import('pages/ReportIssueDetails.vue'),
-        props: true
+        path: "reports/checklist",
+        component: () => import("pages/ReportChecklist.vue"),
+        props: true,
       },
       {
-        path: 'reports/submit',
-        component: () => import('pages/ReportSubmit.vue'),
-        props: true
+        path: "reports/details",
+        component: () => import("pages/ReportIssueDetails.vue"),
+        props: true,
       },
       {
-        path: 'contacts',
-        component: () => import('pages/Contacts.vue'),
-        props: true
-      }
-    ]
+        path: "reports/submit",
+        component: () => import("pages/ReportSubmit.vue"),
+        props: true,
+      },
+      {
+        path: "contacts",
+        component: () => import("pages/Contacts.vue"),
+        props: true,
+      },
+    ],
   },
 
   {
-    path: '/auth',
-    component: () => import('layouts/EmptyLayout.vue'),
+    path: "/auth",
+    component: () => import("layouts/EmptyLayout.vue"),
     children: [
       {
-        path: 'login',
-        component: () => import('pages/Login.vue')
-      }
-    ]
+        path: "login",
+        component: () => import("pages/Login.vue"),
+      },
+    ],
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/Error404.vue')
-  }
-]
+    path: "/:catchAll(.*)*",
+    component: () => import("pages/Error404.vue"),
+  },
+];
 
-export default routes
+export default routes;
