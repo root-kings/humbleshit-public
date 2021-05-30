@@ -15,6 +15,7 @@
       <div class="q-mt-md container text-center">
         <span class="q-mx-md">
           <q-img height="4.5rem" width="4.5rem" :src="sadFace" />
+
         </span>
         <span class="q-mx-md">
           <q-img
