@@ -153,6 +153,7 @@ export default defineComponent({
         value: '6'
       }
     ]
+    const dummyData = ref('')
     const immediateService = ref(false)
     const badReviewDetail = ref('')
     const reviewerName = ref('')
