@@ -15,7 +15,6 @@
       <div class="q-mt-md container text-center">
         <span class="q-mx-md">
           <q-img height="4.5rem" width="4.5rem" :src="sadFace" />
-
         </span>
         <span class="q-mx-md">
           <q-img
@@ -61,44 +60,60 @@
         <div class="q-pt-md row justify-center">
           <div class="col-12">
             <q-form>
-              <div class="q-pa-sm">
-                <r-input-file v-model="attachment" label="Attach a photo" />
+              <div class="q-pt-xs">
+                <r-input-file
+                  v-model="reviewer.attachment"
+                  label="Attach a photo"
+                />
               </div>
 
-              <div class="q-pa-sm">
+              <div class="q-pt-xs">
                 <q-toggle
-                  v-model="immediateService"
+                  v-model="reviewer.isUrgent"
                   color="primary"
                   label="Request immediate service?"
                   keep-color
                   left-label
                 />
               </div>
-              <div class="q-pa-sm">
+              <div
+                class="q-mt-sm text-center text-subtitle1 text-weight-regular"
+              >
+                We'll message when we've got this issue fixed for you.
+              </div>
+              <div class="q-pt-xs">
                 <q-input
-                  v-model="badReviewDetail"
+                  v-model="reviewer.name"
                   outlined
-                  filled
-                  label="Tell us more"
-                  type="textarea"
+                  label="Name*"
+                  :rules="[
+                    (val) => (val && val.length > 0) || 'Please enter name',
+                  ]"
                 />
               </div>
-              <div class="q-pa-sm">
+              <div class="q-pt-xs">
                 <q-input
-                  v-model="reviewerName"
+                  v-model="reviewer.phone"
                   outlined
-                  label="Name (Optional)"
+                  label="Phone*"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val !== null && val !== '') ||
+                      'Please type your phone number',
+                  ]"
+                  mask="(###) ### - ####"
                 />
               </div>
-              <div class="row q-pa-sm justify-center">
+              <div class="row q-pt-xs justify-center">
                 <div class="col-md-6 col-xs-12">
                   <q-btn
                     rounded
                     class="full-width"
                     color="primary"
-                    label="SUBMIT"
-                    icon="check"
-                    @click="submitFeedback"
+                    label="Verify"
+                    icon="fingerprint"
+                    @click="verifyOTP"
                   />
                 </div>
               </div>
@@ -106,110 +121,154 @@
           </div>
         </div>
       </q-card-section>
+      <q-dialog v-model="dialog" position="bottom">
+        <q-card class="full-width">
+          <q-card-section class>
+            <q-input
+              v-model="otp"
+              outlined
+              label="Enter OTP"
+              lazy-rules
+              :rules="[
+                (val) =>
+                  (val !== null && val !== '') ||
+                  'Please type your OTP',
+              ]"
+              mask="######"
+            />
+            <div class="row q-pa-sm justify-center">
+              <div class="col-md-6 col-xs-12">
+                <q-btn
+                  rounded
+                  class="full-width"
+                  color="primary"
+                  label="Submit"
+                  icon="check"
+                  @click="onSubmit"
+                />
+              </div>
+            </div>
+          </q-card-section>
+        </q-card>
+      </q-dialog>
     </q-card-section>
   </q-page>
 </template>
 
 <script>
-import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
-import { useStore } from 'vuex'
-import { useQuasar } from 'quasar'
-import RInputFile from 'components/RInputFile.vue'
+import { defineComponent, ref, reactive, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import { useQuasar } from "quasar";
+import RInputFile from "components/RInputFile.vue";
 
 export default defineComponent({
-  name: 'PublicFeedback',
+  name: "PublicFeedback",
   components: {
-    RInputFile
+    RInputFile,
   },
 
   setup() {
     onMounted(() => {
-      $store.dispatch('general/setTitle', 'humbleShit')
-    })
+      $store.dispatch("general/setTitle", "humbleShit");
+    });
 
     let sadFeedbackOptions = [
       {
-        data: 'Water availability & leakage',
-        value: '1'
+        data: "Water availability & leakage",
+        value: "1",
       },
       {
-        data: 'Cleanliness & odour',
-        value: '2'
+        data: "Cleanliness & odour",
+        value: "2",
       },
       {
-        data: 'Closet/Flush issues',
-        value: '3'
+        data: "Closet/Flush issues",
+        value: "3",
       },
       {
-        data: 'Broken facilities',
-        value: '4'
+        data: "Broken facilities",
+        value: "4",
       },
       {
-        data: 'Soap/Toilet paper',
-        value: '5'
+        data: "Soap/Toilet paper",
+        value: "5",
       },
       {
-        data: 'Other',
-        value: '6'
-      }
-    ]
-    const dummyData = ref('')
-    const immediateService = ref(false)
-    const badReviewDetail = ref('')
-    const reviewerName = ref('')
-    const selectedFeedback = ref(Array(sadFeedbackOptions.length).fill(false))
-    const location = ref('AIIMS Patna. Washroom 7')
+        data: "Other",
+        value: "6",
+      },
+    ];
 
-    const happyFaceDisabled = ref(require('../assets/happy-face-disabled.png'))
-    const sadFace = ref(require('../assets/sad-face.png'))
-    const attachment = ref([''])
+    let reviewer = reactive({
+      name: null,
+      attachment: null,
+      _id: null,
+      isUrgent: ref(false),
+      phone: null,
+    });
 
-    const submitFeedback = () => {}
+    let dialog = ref(false);
+    let otp = ref("");
+    let selectedFeedback = ref(Array(sadFeedbackOptions.length).fill(false));
+    let location = ref("AIIMS Patna. Washroom 7");
 
-    const $q = useQuasar()
-    const $store = useStore()
+    let happyFaceDisabled = ref(require("../assets/happy-face-disabled.png"));
+    let sadFace = ref(require("../assets/sad-face.png"));
+
+    let verifyOTP = () => {
+      dialog.value = true;
+    };
+    let onSubmit = () => {
+      dialog.value = false
+    };
+
+    const $q = useQuasar();
+    const $store = useStore();
 
     return {
+      otp,
+      onSubmit,
+      dialog,
+      reviewer,
+      verifyOTP,
       happyFaceDisabled,
       sadFace,
       sadFeedbackOptions,
       selectedFeedback,
-      attachment,
       RInputFile,
-      immediateService,
-      badReviewDetail,
-      reviewerName,
-      submitFeedback,
-      location
-    }
-  }
-})
+      location,
+    };
+  },
+});
 </script>
 <style lang="sass" scoped>
 .my-card
-    width: 100%
-    max-width: 200px
-    height: 7.8rem
-    margin: .2em
-    background: rgba(243, 230, 242, 0.5) // Red
-    // background: rgba(147, 219, 112, 0.2) // Green
-    border: 3px solid rgba(112, 128, 144, 0.8)
-
+  width: 100%
+  max-width: 200px
+  height: 7.8rem
+  margin: .2em
+  background: rgba(243, 230, 242, 0.5) // Red
+  // background: rgba(147, 219, 112, 0.2) // Green
+  border: 3px solid rgba(112, 128, 144, 0.8)
 .active
-    // background: rgba(147, 219, 112, 0.7) // Green
-    border-color: rgba(102, 63, 83, 0.5)
-    background: rgba(224, 189, 199, 0.8) // Red
+  // background: rgba(147, 219, 112, 0.7) // Green
+  border-color: rgba(102, 63, 83, 0.5)
+  background: rgba(224, 189, 199, 0.8) // Red
 .label-width
-    width: 7.75rem
+  width: 7.75rem
 .align-items-center
-    align-items: center
+  align-items: center
 .justify-content-center
-    justify-content: center
+  justify-content: center
 .d-none
-    display: none
+  display: none
 .card-checkbox
-    height: 1.5rem
+  height: 1.5rem
 .feedback-check
-    top:-5px
-    left:-5px
+  top: -5px
+  left: -5px
+.show
+  display: block
+.hide
+  display: none
 </style>
