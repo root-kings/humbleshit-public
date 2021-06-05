@@ -26,12 +26,12 @@
         </span>
       </div>
       <div class="q-mt-xl text-center text-h5 text-weight-regular">
-        What did you Like?
+        What did you like?
       </div>
       <div class="container q-mt-md">
         <div class="row align-items-center justify-content-center">
           <div
-            v-for="(opt, i) in sadFeedbackOptions"
+            v-for="(opt, i) in happyFeedbackOptions"
             :key="i"
             class="q-pa-sm column q-gutter-xs"
           >
@@ -60,74 +60,60 @@
         <div class="q-pt-md row justify-center">
           <div class="col-12">
             <q-form>
-              <div class="q-pa-sm">
-                <r-input-file v-model="attachment" label="Attach a photo" />
-              </div>
-
-              <div class="q-pa-sm">
-                <div class="q-gutter-y-md column">
-                  <div class="q-mt-xl text-center text-h5 text-weight-regular">
-                    Rate this Toilet
-                  </div>
-                  <q-rating
-                    name="quality"
-                    v-model="quality"
-                    max="5"
-                    size="3.5em"
-                    color="green"
-                    icon="star_border"
-                    icon-selected="star"
-                    no-dimming
-                  />
+              <div class="q-pt-xs text-center">
+                <div class="text-h6 text-weight-regular">
+                  Rate this toilet
                 </div>
+                <q-rating
+                  v-model="reviewer.quality"
+                  name="quality"
+                  max="5"
+                  color="green"
+                  icon="star_border"
+                  icon-selected="star"
+                  class="star-size"
+                  no-dimming
+                />
               </div>
-              <div class="q-mt-xl text-center text-h6 text-weight-regular">
+              <div class="q-pt-md">
+                <q-input
+                  v-model="reviewer.name"
+                  outlined
+                  label="Name*"
+                  :rules="[
+                    (val) => (val && val.length > 0) || 'Please enter name',
+                  ]"
+                />
+              </div>
+              <div class="q-pt-xs">
+                <q-input
+                  v-model="reviewer.phone"
+                  outlined
+                  label="Phone*"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val !== null && val !== '') ||
+                      'Please type your phone number',
+                  ]"
+                  mask="(###) ### - ####"
+                />
+              </div>
+              <div
+                class="q-mt-xs text-center text-subtitle1 text-weight-regular"
+              >
                 This is to verify the authenticity of your feedback, data will
                 remain private
               </div>
-              <div class="q-pa-md" style="max-width: 300px">
-                <form
-                  @submit.prevent.stop="onSubmit"
-                  @reset.prevent.stop="onReset"
-                  class="q-gutter-md"
-                >
-                  <q-input
-                    ref="name"
-                    filled
-                    v-model="name"
-                    label="Your name *"
-                    hint="Valid Name"
-                    lazy-rules
-                    :rules="[
-                      val => (val && val.length > 0) || 'Please type something'
-                    ]"
-                  />
-
-                  <q-input
-                    ref="number"
-                    filled
-                    outlined
-                    v-model="phone"
-                    label="Your Number *"
-                    mask="##########"
-                    hint="Enter your 10 digit number"
-                    lazy-rules
-                    :rules="[
-                      val => (val && val.length > 0) || 'Please type something'
-                    ]"
-                  />
-                </form>
-              </div>
-
-              <div class="row q-pa-sm justify-center">
+              <div class="row q-pt-md justify-center">
                 <div class="col-md-6 col-xs-12">
                   <q-btn
                     rounded
                     class="full-width"
                     color="primary"
-                    label="SUBMIT"
-                    icon="check"
-                    @click="submitFeedback"
+                    label="Verify"
+                    icon="fingerprint"
+                    @click="verifyOTP"
                   />
                 </div>
               </div>
@@ -135,6 +121,36 @@
           </div>
         </div>
       </q-card-section>
+      <q-dialog v-model="dialog" position="bottom">
+        <q-card class="full-width">
+          <q-card-section class>
+            <q-input
+              v-model="otp"
+              outlined
+              label="Enter OTP"
+              lazy-rules
+              :rules="[
+                (val) =>
+                  (val !== null && val !== '') ||
+                  'Please type your OTP',
+              ]"
+              mask="######"
+            />
+            <div class="row q-pa-sm justify-center">
+              <div class="col-md-6 col-xs-12">
+                <q-btn
+                  rounded
+                  class="full-width"
+                  color="primary"
+                  label="Submit"
+                  icon="check"
+                  @click="onSubmit"
+                />
+              </div>
+            </div>
+          </q-card-section>
+        </q-card>
+      </q-dialog>
     </q-card-section>
   </q-page>
 </template>
@@ -143,19 +159,10 @@
 import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
-import RInputFile from 'components/RInputFile.vue'
 
 export default defineComponent({
   name: 'PublicFeedback',
   components: {
-    RInputFile
-  },
-
-  data() {
-    return {
-      phone: null,
-      name: null
-    }
   },
 
   setup() {
@@ -163,60 +170,78 @@ export default defineComponent({
       $store.dispatch('general/setTitle', 'humbleShit')
     })
 
-    let sadFeedbackOptions = [
+    let happyFeedbackOptions = [
       {
-        data: 'Water availability & leakage',
+        data: 'Neat & clean seats',
         value: '1'
       },
       {
-        data: 'Cleanliness & odour',
+        data: 'Fragrance & ventilation',
         value: '2'
       },
       {
-        data: 'Closet/Flush issues',
+        data: 'Soap & toilet paper available',
         value: '3'
       },
       {
-        data: 'Broken facilities',
+        data: 'Clean & dry floor',
         value: '4'
       },
       {
-        data: 'Soap/Toilet paper',
+        data: 'Facilities & amenities',
         value: '5'
       },
       {
-        data: 'Other',
+        data: 'Waste & disposal system',
         value: '6'
+      },
+      {
+        data: 'Staff behaviour',
+        value: '7'
+      },
+      {
+        data: 'Anyhting else',
+        value: '8'
       }
     ]
-    const dummyData = ref('')
-    const immediateService = ref(false)
-    const badReviewDetail = ref('')
-    const reviewerName = ref('')
-    const selectedFeedback = ref(Array(sadFeedbackOptions.length).fill(false))
+
+    let reviewer = reactive({
+      name: null,
+      quality: null,
+      _id: null,
+      phone: null,
+    });
+
+    let dialog = ref(false);
+    let otp = ref("");
+    const selectedFeedback = ref(Array(happyFeedbackOptions.length).fill(false))
     const location = ref('AIIMS Patna. Washroom 7')
 
     const sadFaceDisabled = ref(require('../assets/sad-face-disabled.png'))
     const happyFace = ref(require('../assets/happy-face.png'))
-    const attachment = ref([''])
 
-    const submitFeedback = () => {}
+    let verifyOTP = () => {
+      dialog.value = true;
+    };
+    let onSubmit = () => {
+      dialog.value = false
+      console.log(reviewer)
+    };
 
     const $q = useQuasar()
     const $store = useStore()
 
     return {
+      otp,
+      onSubmit,
+      dialog,
+      verifyOTP,
       sadFaceDisabled,
       happyFace,
-      sadFeedbackOptions,
+      happyFeedbackOptions,
       selectedFeedback,
-      attachment,
-      RInputFile,
-      immediateService,
-      badReviewDetail,
-      reviewerName,
-      submitFeedback,
-      location
+      location,
+      reviewer
     }
   }
 })
@@ -249,4 +274,9 @@ export default defineComponent({
 .feedback-check
     top:-5px
     left:-5px
+.star-size
+    font-size: 3.2em
+@media (max-width: 330px)
+    .star-size
+        font-size: 2.5em
 </style>
