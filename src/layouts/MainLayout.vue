@@ -12,32 +12,6 @@
       <router-view />
     </q-page-container>
 
-    <q-footer bordered class="bg-white">
-      <q-tabs
-        class="row text-grey"
-        active-color="primary"
-        switch-indicator
-        narrow-indicator
-      >
-        <q-route-tab
-          v-for="link in navigationLinks"
-          :key="link.link"
-          :name="link.title"
-          :to="link.link"
-          :icon="link.icon"
-          class="col"
-          exact
-        />
-
-        <q-route-tab
-          name="Menu"
-          to="/menu"
-          icon="eva-menu-outline"
-          class="col"
-          exact
-        />
-      </q-tabs>
-    </q-footer>
   </q-layout>
 </template>
 

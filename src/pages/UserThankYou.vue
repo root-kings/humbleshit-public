@@ -10,9 +10,9 @@
           <div class="q-mt-md container text-center">
             <span class="q-mx-md">
               <q-img
-                  height="8rem"
-                  width="8rem"
-                  :src="thankYouPlane"
+                height="8rem"
+                width="8rem"
+                :src="thankYouPlane"
               />
             </span>
           </div>
@@ -95,17 +95,9 @@ import { useQuasar } from 'quasar'
 export default defineComponent({
   name: 'ThankYou',
 
-  props: {
-    feedbackTypeInput: {
-      type: String,
-      default: ''
-    }
-  },
+  setup() {
 
-  setup(props) {
-
-    let feedbackType = ref('')
-    let reviewType = ref('good')
+    let reviewType = ref('bad')
     let detailedGoodReview = ref('')
     let detailedSadReview = ref('')
     let thankYouMessage = ref('')
@@ -114,7 +106,6 @@ export default defineComponent({
     else if (reviewType.value == 'bad') thankYouMessage.value = 'Your issue #14437 has been submitted to the administration';
 
     onMounted(() => {
-      feedbackType.value = props.feedbackTypeInput
       $store.dispatch('general/setTitle', 'humbleShit')
     })
 
@@ -126,7 +117,6 @@ export default defineComponent({
     const $store = useStore()
 
     return {
-      feedbackType,
       reviewType,
       detailedSadReview,
       detailedGoodReview,
@@ -146,13 +136,4 @@ export default defineComponent({
     margin: .2em
     background: rgb(176, 196, 222, 0.3) // Green
     border: 2px solid rgba(112, 128, 144, 0.8)
-.thankyou
-  background: rgba(147, 219, 112, 0.2)
-  text-align: center
-  width: 13rem
-  height: 13rem
-  border: 1px solid green
-  border-radius: 2%
-  padding: 50px
-  margin: 20px
 </style>
