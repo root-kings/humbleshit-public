@@ -56,7 +56,7 @@ import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
 
 export default defineComponent({
-  name: 'PublicFeedback',
+  name: 'UserFeedback',
   components: {},
 
   setup() {

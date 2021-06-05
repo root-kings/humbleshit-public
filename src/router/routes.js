@@ -43,8 +43,8 @@ const routes = [
       },
       {
         name: ' *-',
-        path: 'thankyouhappy',
-        component: () => import('src/pages/ThankyouHappy.vue')
+        path: 'thankyou',
+        component: () => import('src/pages/UserThankYou.vue')
       },
       {
         path: 'staff',

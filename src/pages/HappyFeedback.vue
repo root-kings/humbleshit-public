@@ -29,7 +29,7 @@
         What did you like?
       </div>
       <div class="container q-mt-md">
-        <div class="row align-items-center justify-content-center">
+        <div class="row items-center justify-center">
           <div
             v-for="(opt, i) in happyFeedbackOptions"
             :key="i"
@@ -161,7 +161,7 @@ import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
 
 export default defineComponent({
-  name: 'PublicFeedback',
+  name: 'HappyFeedback',
   components: {
   },
 

@@ -29,7 +29,7 @@
         What went wrong?
       </div>
       <div class="container q-mt-md">
-        <div class="row align-items-center justify-content-center">
+        <div class="row items-center justify-center">
           <div
             v-for="(opt, i) in sadFeedbackOptions"
             :key="i"
@@ -160,11 +160,13 @@ import { defineComponent, ref, reactive, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 import RInputFile from "components/RInputFile.vue";
+// import ThankYou from "./ThankyouHappy.vue";
 
 export default defineComponent({
-  name: "PublicFeedback",
+  name: "SadFeedback",
   components: {
     RInputFile,
+    // ThankYou,
   },
 
   setup() {
@@ -220,6 +222,7 @@ export default defineComponent({
     };
     let onSubmit = () => {
       dialog.value = false
+      window.location = "/#/thankyou";
     };
 
     const $q = useQuasar();
@@ -237,6 +240,7 @@ export default defineComponent({
       selectedFeedback,
       RInputFile,
       location,
+      // ThankYou
     };
   },
 });
