@@ -27,16 +27,25 @@
             lazy-rules
             :rules="[val => (val && val.length > 0) || 'Please type something']"
         />
-        <div class="q-mt-xl container text-center">
-            <span class="q-mx-md cursor-pointer">
-                <q-img
-                    height="7rem"
-                    width="7rem"
-                    :src="happyFace"
-                    @click="getUserFeedback('happy')"
-                />
-            </span>
-            <span class="q-mx-md cursor-pointer">
+        <div class="q-mt-xl row items-center justify-evenly">
+            <q-card
+              bordered
+              class="happy-card cursor-pointer text-center"
+            >
+              <span>
+                  <q-img
+                      height="7rem"
+                      width="7rem"
+                      :src="happyFace"
+                      @click="getUserFeedback('happy')"
+                  />
+              </span>
+            </q-card>
+            <q-card
+              bordered
+              class="sad-card cursor-pointer text-center"
+            >
+            <span>
                 <q-img
                     height="7rem"
                     width="7rem"
@@ -44,6 +53,8 @@
                     @click="getUserFeedback('sad')"
                 />
             </span>
+            </q-card>
+          
         </div>
         
     </q-card-section>
@@ -98,3 +109,15 @@ export default defineComponent({
   }
 })
 </script>
+<style lang="sass" scoped>
+.happy-card
+  width: 7.8rem
+  height: 7.8rem
+  margin: .2em
+  border: 3px solid rgba(147, 219, 112, 0.6)
+.sad-card
+  width: 7.8rem
+  height: 7.8rem
+  margin: .2em
+  border: 3px solid rgba(224, 189, 199)
+</style>
