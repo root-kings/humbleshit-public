@@ -99,10 +99,10 @@
                   lazy-rules
                   :rules="[
                     (val) =>
-                      (val !== null && val !== '') ||
-                      'Please type your phone number',
+                      (val !== null && val !== '' && val.length > 9) ||
+                      'Please type a valid phone number',
                   ]"
-                  mask="(###) ### - ####"
+                  mask="##########"
                 />
               </div>
               <div class="row q-pt-xs justify-center">
@@ -131,8 +131,8 @@
               lazy-rules
               :rules="[
                 (val) =>
-                  (val !== null && val !== '') ||
-                  'Please type your OTP',
+                  (val !== null && val !== '' && val.length > 5) ||
+                  'Please enter a valid 6-digit OTP',
               ]"
               mask="######"
             />

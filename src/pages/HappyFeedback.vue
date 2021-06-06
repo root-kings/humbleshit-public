@@ -93,10 +93,10 @@
                   lazy-rules
                   :rules="[
                     (val) =>
-                      (val !== null && val !== '') ||
-                      'Please type your phone number',
+                      (val !== null && val !== '' && val.length > 9) ||
+                      'Please type a valid phone number',
                   ]"
-                  mask="(###) ### - ####"
+                  mask="##########"
                 />
               </div>
               <div
@@ -131,8 +131,8 @@
               lazy-rules
               :rules="[
                 (val) =>
-                  (val !== null && val !== '') ||
-                  'Please type your OTP',
+                  (val !== null && val !== '' && val.length > 5) ||
+                  'Please enter a valid 6-digit OTP',
               ]"
               mask="######"
             />
@@ -207,7 +207,7 @@ export default defineComponent({
 
     let reviewer = reactive({
       name: null,
-      quality: null,
+      quality: 0,
       _id: null,
       phone: null,
     });
@@ -225,7 +225,7 @@ export default defineComponent({
     };
     let onSubmit = () => {
       dialog.value = false
-      console.log(reviewer)
+      window.location = "/#/thankyou";
     };
 
     const $q = useQuasar()

@@ -1,8 +1,8 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header bordered class="bg-white text-primary text-center">
+    <q-header bordered class="bg-white text-primary">
       <q-toolbar>
-        <q-toolbar-title>
+        <q-toolbar-title class="text-center">
           {{ title }}
         </q-toolbar-title>
       </q-toolbar>
@@ -36,7 +36,7 @@ export default {
   },
 
   created() {
-    this.checkLogin()
+    // this.checkLogin()
   },
 
   methods: {
