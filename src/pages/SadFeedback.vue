@@ -62,14 +62,14 @@
             <q-form>
               <div class="q-pt-xs">
                 <r-input-file
-                  v-model="reviewer.attachment"
+                  v-model="sadFeedbackInfo.attachment"
                   label="Attach a photo"
                 />
               </div>
 
               <div class="q-pt-xs">
                 <q-toggle
-                  v-model="reviewer.isUrgent"
+                  v-model="sadFeedbackInfo.isImmediateService"
                   color="primary"
                   label="Request immediate service?"
                   keep-color
@@ -83,7 +83,7 @@
               </div>
               <div class="q-pt-xs">
                 <q-input
-                  v-model="reviewer.name"
+                  v-model="sadFeedbackInfo.name"
                   outlined
                   label="Name*"
                   :rules="[
@@ -93,7 +93,7 @@
               </div>
               <div class="q-pt-xs">
                 <q-input
-                  v-model="reviewer.phone"
+                  v-model="sadFeedbackInfo.phone"
                   outlined
                   label="Phone*"
                   lazy-rules
@@ -160,18 +160,20 @@ import { defineComponent, ref, reactive, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 import RInputFile from "components/RInputFile.vue";
-// import ThankYou from "./ThankyouHappy.vue";
+import { useRoute, useRouter } from "vue-router";
+import { api, fetcher } from 'boot/axios'
 
 export default defineComponent({
   name: "SadFeedback",
   components: {
     RInputFile,
-    // ThankYou,
   },
 
   setup() {
     const $q = useQuasar();
     const $store = useStore();
+    const route = useRoute();
+    const $router = useRouter();
 
     onMounted(() => {
       $store.dispatch("general/setTitle", "humbleShit");
@@ -179,11 +181,11 @@ export default defineComponent({
 
     let sadFeedbackOptions = ref(computed(() => $store.getters['general/sadFeedbacks'])).value
 
-    let reviewer = reactive({
+    let sadFeedbackInfo = reactive({
       name: null,
       attachment: null,
       _id: null,
-      isUrgent: ref(false),
+      isImmediateService: ref(false),
       phone: null,
     });
 
@@ -195,19 +197,39 @@ export default defineComponent({
     let happyFaceDisabled = ref(require("../assets/happy-face-disabled.png"));
     let sadFace = ref(require("../assets/sad-face.png"));
 
-    let verifyOTP = () => {
+    const verifyOTP = () => {
       dialog.value = true;
     };
-    let onSubmit = () => {
+    const onSubmit = () => {
+      let takenFeedback = []
+      for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(sadFeedbackOptions[idx])
+      sadFeedbackInfo.feedbacks = takenFeedback;
+
+      api
+        .put('/feedbacks/' + route.query.feedbackId, { sadFeedbackInfo: sadFeedbackInfo })
+        .then(response => {
+          console.log(response)
+          if(response.status == 200) {
+            $router.push({
+              name: "thankyou",
+              query: { 
+                key: route.query.key,
+                feedbackId: route.query.feedbackId,
+                }
+            })
+          }
+        })
+        .catch(error => {
+          console.error(error)
+        })
       dialog.value = false
-      window.location = "/#/thankyou";
     };
 
     return {
       otp,
       onSubmit,
       dialog,
-      reviewer,
+      sadFeedbackInfo,
       verifyOTP,
       happyFaceDisabled,
       sadFace,

@@ -65,7 +65,7 @@
                   Rate this toilet
                 </div>
                 <q-rating
-                  v-model="reviewer.quality"
+                  v-model="happyFeedbackInfo.rating"
                   name="quality"
                   max="5"
                   color="green"
@@ -77,7 +77,7 @@
               </div>
               <div class="q-pt-md">
                 <q-input
-                  v-model="reviewer.name"
+                  v-model="happyFeedbackInfo.name"
                   outlined
                   label="Name*"
                   :rules="[
@@ -87,7 +87,7 @@
               </div>
               <div class="q-pt-xs">
                 <q-input
-                  v-model="reviewer.phone"
+                  v-model="happyFeedbackInfo.phone"
                   outlined
                   label="Phone*"
                   lazy-rules
@@ -159,6 +159,8 @@
 import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
+import { useRoute, useRouter } from "vue-router";
+import { api, fetcher } from 'boot/axios'
 
 export default defineComponent({
   name: 'HappyFeedback',
@@ -167,17 +169,22 @@ export default defineComponent({
 
   setup() {
     const $store = useStore()
+    const route = useRoute();
+    const $router = useRouter();
+
     onMounted(() => {
       $store.dispatch('general/setTitle', 'humbleShit')
+      console.log('happy route : ', route.query)
     })
 
     let happyFeedbackOptions = ref(computed(() => $store.getters['general/happyFeedbacks'])).value
 
-    let reviewer = reactive({
+    let happyFeedbackInfo = reactive({
       name: null,
-      quality: 0,
+      rating: 0,
       _id: null,
       phone: null,
+      feedbacks: null,
     });
 
     let dialog = ref(false);
@@ -188,27 +195,45 @@ export default defineComponent({
     const sadFaceDisabled = ref(require('../assets/sad-face-disabled.png'))
     const happyFace = ref(require('../assets/happy-face.png'))
 
-    let verifyOTP = () => {
+    const verifyOTP = () => {
       dialog.value = true;
     };
-    let onSubmit = () => {
-      dialog.value = false
-      window.location = "/#/thankyou";
-    };
+    const onSubmit = () => {
+      let takenFeedback = []
+      for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(happyFeedbackOptions[idx])
+      happyFeedbackInfo.feedbacks = takenFeedback;
 
-    const $q = useQuasar()
+      api
+        .put('/feedbacks/' + route.query.feedbackId, { happyFeedbackInfo: happyFeedbackInfo })
+        .then(response => {
+          console.log(response)
+          if(response.status == 200) {
+            $router.push({
+              name: "thankyou",
+              query: { 
+                key: route.query.key,
+                feedbackId: route.query.feedbackId,
+                }
+            })
+          }
+        })
+        .catch(error => {
+          console.error(error)
+        })
+      dialog.value = false
+    };
 
     return {
       otp,
-      onSubmit,
       dialog,
-      verifyOTP,
       sadFaceDisabled,
       happyFace,
       happyFeedbackOptions,
       selectedFeedback,
       location,
-      reviewer
+      happyFeedbackInfo,
+      onSubmit,
+      verifyOTP,
     }
   }
 })

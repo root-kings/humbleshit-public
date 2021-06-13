@@ -42,7 +42,7 @@ const routes = [
         component: () => import('src/pages/HappyFeedback.vue')
       },
       {
-        name: ' *-',
+        name: 'thankyou',
         path: 'thankyou',
         component: () => import('src/pages/UserThankYou.vue')
       },

@@ -37,7 +37,7 @@
                       height="7rem"
                       width="7rem"
                       :src="happyFace"
-                      @click="getUserFeedback('happy')"
+                      @click="getUserFeedback('good')"
                   />
               </span>
             </q-card>
@@ -50,7 +50,7 @@
                     height="7rem"
                     width="7rem"
                     :src="sadFace"
-                    @click="getUserFeedback('sad')"
+                    @click="getUserFeedback('bad')"
                 />
             </span>
             </q-card>
@@ -65,19 +65,30 @@
 import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
+import { api, fetcher } from 'boot/axios'
+import { useRouter } from "vue-router";
+import useSWRV from 'swrv'
+
 
 export default defineComponent({
   name: 'UserFeedback',
   components: {},
 
   setup() {
+    const $q = useQuasar()
+    const $store = useStore()
+    const $router = useRouter();
+    // const $router = useRouter
+
     onMounted(() => {
       $store.dispatch('general/setTitle', 'humbleShit')
     })
 
-    const userFeedbackObj = ref({
+    const userFeedbackObj = reactive({
+        'facility': null,
         'userType': null,
         'otherUserType': null,
+        'reviewType': ''
     })
 
     const userTypeList = ref([
@@ -92,12 +103,41 @@ export default defineComponent({
     const sadFace = ref(require('../assets/sad-face.png'))
 
     const getUserFeedback = (event) => {
-        if (event == 'sad') window.location = "/#/sadfeedback";
-        if (event == 'happy') window.location = "/#/happyfeedback";
+
+        userFeedbackObj.reviewType = event;
+        api
+          // .post('/feedbacks', userFeedbackObj)
+          .get('/feedbacks/60c5ca2468e16bd52c1de51f') // good
+          // .get('/feedbacks/60c60214ca6234f8e76385e8') // bad
+          .then(response => {
+            console.log("resp: ", response)
+            const feedbackId = response.data.id;
+            if(response.status == 200) {
+              if (event == 'bad'){
+                $router.push({
+                  name: "sadfeedback",
+                  query: { 
+                    key: event,
+                    feedbackId: feedbackId,
+                   }
+                })
+              } 
+              if (event == 'good'){
+                $router.push({
+                  name: "happyfeedback",
+                  query: {
+                    key: event,
+                    feedbackId: feedbackId,
+                  }
+                })
+              }
+            }
+          })
+          .catch(error => {
+            console.error(error)
+          })
     }
 
-    const $q = useQuasar()
-    const $store = useStore()
 
     return {
         userFeedbackObj,

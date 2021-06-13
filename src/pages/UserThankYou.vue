@@ -88,33 +88,59 @@
 </template>
 
 <script>
-import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
+import { Vue, defineComponent, ref, reactive, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
+import { useRoute } from "vue-router";
+import { api, fetcher } from 'boot/axios'
 
 export default defineComponent({
   name: 'ThankYou',
 
+
   setup() {
 
-    let reviewType = ref('bad')
-    let detailedGoodReview = ref('')
-    let detailedSadReview = ref('')
-    let thankYouMessage = ref('')
-    const thankYouPlane = ref(require('../assets/paper-plane-100.png'))
-    if (reviewType.value == 'good') thankYouMessage.value = 'Your review has been submitted to the administration.';
-    else if (reviewType.value == 'bad') thankYouMessage.value = 'Your issue #14437 has been submitted to the administration';
+    const route = useRoute();
+    const $store = useStore()
+
+    let reviewType = computed(() => {
+      return route.query.key
+    })
 
     onMounted(() => {
       $store.dispatch('general/setTitle', 'humbleShit')
     })
 
+    let detailedGoodReview = ref('')
+    let detailedSadReview = ref('')
+    let thankYouMessage = ref('')
+    const thankYouPlane = ref(require('../assets/paper-plane-100.png'))
+    if (reviewType.value == 'good') thankYouMessage.value = 'Your review has been submitted to the administration.';
+    else if (reviewType.value == 'bad') thankYouMessage.value = 'Your issue #' + route.query.feedbackId + ' has been submitted to the administration';
+
     const contactHousekeeping = () => {}
-    const getFollowUp = () => {}
-    const onSave = () => {}
+    const getFollowUp = () => {
+      api
+        .put('/feedbacks/' + route.query.feedbackId, { extraInfo: detailedSadReview.value })
+        .then(response => {
+          console.log('thankyou, bad: ', response)
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    }
+    const onSave = () => {
+      api
+        .put('/feedbacks/' + route.query.feedbackId, { extraInfo: detailedGoodReview.value })
+        .then(response => {
+          console.log('thankyou, good: ', response)
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    }
 
     const $q = useQuasar()
-    const $store = useStore()
 
     return {
       reviewType,
