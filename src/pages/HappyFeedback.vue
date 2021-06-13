@@ -202,24 +202,31 @@ export default defineComponent({
       let takenFeedback = []
       for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(happyFeedbackOptions[idx])
       happyFeedbackInfo.feedbacks = takenFeedback;
-
-      api
-        .put('/feedbacks/' + route.query.feedbackId, { happyFeedbackInfo: happyFeedbackInfo })
-        .then(response => {
-          console.log(response)
-          if(response.status == 200) {
-            $router.push({
-              name: "thankyou",
-              query: { 
-                key: route.query.key,
-                feedbackId: route.query.feedbackId,
-                }
-            })
+      $router.push({
+        name: "thankyou",
+        query: { 
+          key: route.query.key,
+          feedbackId: route.query.feedbackId,
           }
-        })
-        .catch(error => {
-          console.error(error)
-        })
+      })
+
+      // api
+      //   .put('/feedbacks/' + route.query.feedbackId, { happyFeedbackInfo: happyFeedbackInfo })
+      //   .then(response => {
+      //     console.log(response)
+      //     if(response.status == 200) {
+      //       $router.push({
+      //         name: "thankyou",
+      //         query: { 
+      //           key: route.query.key,
+      //           feedbackId: route.query.feedbackId,
+      //           }
+      //       })
+      //     }
+      //   })
+      //   .catch(error => {
+      //     console.error(error)
+      //   })
       dialog.value = false
     };
 

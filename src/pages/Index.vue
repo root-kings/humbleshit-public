@@ -105,37 +105,55 @@ export default defineComponent({
     const getUserFeedback = (event) => {
 
         userFeedbackObj.reviewType = event;
-        api
-          // .post('/feedbacks', userFeedbackObj)
-          .get('/feedbacks/60c5ca2468e16bd52c1de51f') // good
-          // .get('/feedbacks/60c60214ca6234f8e76385e8') // bad
-          .then(response => {
-            console.log("resp: ", response)
-            const feedbackId = response.data.id;
-            if(response.status == 200) {
-              if (event == 'bad'){
-                $router.push({
-                  name: "sadfeedback",
-                  query: { 
-                    key: event,
-                    feedbackId: feedbackId,
-                   }
-                })
-              } 
-              if (event == 'good'){
-                $router.push({
-                  name: "happyfeedback",
-                  query: {
-                    key: event,
-                    feedbackId: feedbackId,
-                  }
-                })
+        if (event == 'bad'){
+          $router.push({
+            name: "sadfeedback",
+            query: { 
+              key: event,
+              feedbackId: 'feedback_id_bad',
               }
+          })
+        } 
+        if (event == 'good'){
+          $router.push({
+            name: "happyfeedback",
+            query: {
+              key: event,
+              feedbackId: 'feedback_id_good',
             }
           })
-          .catch(error => {
-            console.error(error)
-          })
+        }
+        // api
+        //   .post('/feedbacks', userFeedbackObj)
+        //   // .get('/feedbacks/60c5ca2468e16bd52c1de51f') // good
+        //   // .get('/feedbacks/60c60214ca6234f8e76385e8') // bad
+        //   .then(response => {
+        //     console.log("resp: ", response)
+        //     const feedbackId = response.data.id;
+        //     if(response.status == 200) {
+        //       if (event == 'bad'){
+        //         $router.push({
+        //           name: "sadfeedback",
+        //           query: { 
+        //             key: event,
+        //             feedbackId: feedbackId,
+        //            }
+        //         })
+        //       } 
+        //       if (event == 'good'){
+        //         $router.push({
+        //           name: "happyfeedback",
+        //           query: {
+        //             key: event,
+        //             feedbackId: feedbackId,
+        //           }
+        //         })
+        //       }
+        //     }
+        //   })
+        //   .catch(error => {
+        //     console.error(error)
+        //   })
     }
 
 
