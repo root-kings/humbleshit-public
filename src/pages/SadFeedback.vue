@@ -158,7 +158,6 @@
 <script>
 import { defineComponent, ref, reactive, onMounted, computed } from "vue";
 import { useStore } from "vuex";
-import { useQuasar } from "quasar";
 import RInputFile from "components/RInputFile.vue";
 import { useRoute, useRouter } from "vue-router";
 import { api, fetcher } from 'boot/axios'
@@ -170,7 +169,6 @@ export default defineComponent({
   },
 
   setup() {
-    const $q = useQuasar();
     const $store = useStore();
     const route = useRoute();
     const $router = useRouter();
@@ -204,46 +202,38 @@ export default defineComponent({
       let takenFeedback = []
       for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(sadFeedbackOptions[idx])
       sadFeedbackInfo.feedbacks = takenFeedback;
-      $router.push({
-        name: "thankyou",
-        query: { 
-          key: route.query.key,
-          feedbackId: route.query.feedbackId,
+      api
+        .put('/feedbacks/' + route.query.feedbackId, { sadFeedbackInfo: sadFeedbackInfo })
+        .then(response => {
+          // console.log(response)
+          if(response.status == 200) {
+            $router.push({
+              name: "thankyou",
+              query: { 
+                key: route.query.key,
+                feedbackId: route.query.feedbackId,
+                }
+            })
           }
-      })
-
-      // api
-      //   .put('/feedbacks/' + route.query.feedbackId, { sadFeedbackInfo: sadFeedbackInfo })
-      //   .then(response => {
-      //     console.log(response)
-      //     if(response.status == 200) {
-      //       $router.push({
-      //         name: "thankyou",
-      //         query: { 
-      //           key: route.query.key,
-      //           feedbackId: route.query.feedbackId,
-      //           }
-      //       })
-      //     }
-      //   })
-      //   .catch(error => {
-      //     console.error(error)
-      //   })
+        })
+        .catch(error => {
+          console.error(error)
+        })
       dialog.value = false
     };
 
     return {
+      RInputFile,
       otp,
-      onSubmit,
       dialog,
       sadFeedbackInfo,
-      verifyOTP,
       happyFaceDisabled,
       sadFace,
       sadFeedbackOptions,
       selectedFeedback,
-      RInputFile,
       location,
+      onSubmit,
+      verifyOTP,
     };
   },
 });
@@ -263,19 +253,7 @@ export default defineComponent({
   background: rgba(224, 189, 199, 0.8) // Red
 .label-width
   width: 7.75rem
-.align-items-center
-  align-items: center
-.justify-content-center
-  justify-content: center
-.d-none
-  display: none
-.card-checkbox
-  height: 1.5rem
 .feedback-check
   top: -5px
   left: -5px
-.show
-  display: block
-.hide
-  display: none
 </style>

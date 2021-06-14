@@ -158,7 +158,6 @@
 <script>
 import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
-import { useQuasar } from 'quasar'
 import { useRoute, useRouter } from "vue-router";
 import { api, fetcher } from 'boot/axios'
 
@@ -202,31 +201,23 @@ export default defineComponent({
       let takenFeedback = []
       for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(happyFeedbackOptions[idx])
       happyFeedbackInfo.feedbacks = takenFeedback;
-      // $router.push({
-      //   name: "thankyou",
-      //   query: { 
-      //     key: route.query.key,
-      //     feedbackId: route.query.feedbackId,
-      //     }
-      // })
-
-      // api
-      //   .put('/feedbacks/' + route.query.feedbackId, { happyFeedbackInfo: happyFeedbackInfo })
-      //   .then(response => {
-      //     console.log(response)
-      //     if(response.status == 200) {
-      //       $router.push({
-      //         name: "thankyou",
-      //         query: { 
-      //           key: route.query.key,
-      //           feedbackId: route.query.feedbackId,
-      //           }
-      //       })
-      //     }
-      //   })
-      //   .catch(error => {
-      //     console.error(error)
-      //   })
+      api
+        .put('/feedbacks/' + route.query.feedbackId, { happyFeedbackInfo: happyFeedbackInfo })
+        .then(response => {
+          // console.log(response)
+          if(response.status == 200) {
+            $router.push({
+              name: "thankyou",
+              query: { 
+                key: route.query.key,
+                feedbackId: route.query.feedbackId,
+                }
+            })
+          }
+        })
+        .catch(error => {
+          console.error(error)
+        })
       dialog.value = false
     };
 
@@ -257,19 +248,10 @@ export default defineComponent({
 
 .active
     background: rgba(147, 219, 112, 0.7) // Green
-
     border-color: rgba(102, 63, 83, 0.5)
     // ! background: rgba(224, 189, 199, 0.8) // Red
 .label-width
     width: 7.75rem
-.align-items-center
-    align-items: center
-.justify-content-center
-    justify-content: center
-.d-none
-    display: none
-.card-checkbox
-    height: 1.5rem
 .feedback-check
     top:-5px
     left:-5px

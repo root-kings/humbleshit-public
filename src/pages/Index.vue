@@ -68,7 +68,6 @@ import { useQuasar } from 'quasar'
 import { api, fetcher } from 'boot/axios'
 import { useRouter } from "vue-router";
 import moment from 'moment-timezone';
-// import useSWRV from 'swrv'
 
 
 export default defineComponent({
@@ -79,7 +78,6 @@ export default defineComponent({
     const $q = useQuasar()
     const $store = useStore()
     const $router = useRouter();
-    // const $router = useRouter
 
     onMounted(() => {
       $store.dispatch('general/setTitle', 'humbleShit')
@@ -109,37 +107,11 @@ export default defineComponent({
       let now = new moment().tz('Asia/Kolkata');
       let sendableTime = now.subtract(15, 'minute')
       if (!lastFeedback.value.timestamp || sendableTime.isAfter(lastFeedback.value.timestamp)) {
-        // allowSending
-      }
-      else {
-        // show error
-      }
-
         userFeedbackObj.reviewType = event;
-        // if (event == 'bad'){
-        //   $router.push({
-        //     name: "sadfeedback",
-        //     query: { 
-        //       key: event,
-        //       feedbackId: 'feedback_id_bad',
-        //       }
-        //   })
-        // } 
-        // if (event == 'good'){
-        //   $router.push({
-        //     name: "happyfeedback",
-        //     query: {
-        //       key: event,
-        //       feedbackId: 'feedback_id_good',
-        //     }
-        //   })
-        // }
         api
-          // .post('/feedbacks', userFeedbackObj)
-          .get('/feedbacks/60c5ca2468e16bd52c1de51f') // good
-          // .get('/feedbacks/60c60214ca6234f8e76385e8') // bad
+          .post('/feedbacks', userFeedbackObj)
           .then(response => {
-            console.log("resp: ", response)
+            // console.log("resp: ", response)
             const feedbackId = response.data.id;
             $store.dispatch('general/setLastFeedback', { feedbackId, timestamp: now })
             if(response.status == 200) {
@@ -166,8 +138,11 @@ export default defineComponent({
           .catch(error => {
             console.error(error)
           })
+      }
+      else {
+        console.log("Your feedback has already been recorded. Please come after sometimes.")
+      }
     }
-
 
     return {
         userFeedbackObj,

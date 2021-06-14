@@ -120,29 +120,25 @@ export default defineComponent({
 
     const contactHousekeeping = () => {}
     const getFollowUp = () => {
-      console.log('thankyou, bad: ', response)
-      // api
-      //   .put('/feedbacks/' + route.query.feedbackId, { extraInfo: detailedSadReview.value })
-      //   .then(response => {
-      //     console.log('thankyou, bad: ', response)
-      //   })
-      //   .catch(error => {
-      //     console.error(error)
-      //   })
+      api
+        .put('/feedbacks/' + route.query.feedbackId, { extraInfo: detailedSadReview.value })
+        .then(response => {
+          // console.log('thankyou, bad: ', response)
+        })
+        .catch(error => {
+          console.error(error)
+        })
     }
     const onSave = () => {
-      console.log('thankyou, good: ', response)
-      // api
-      //   .put('/feedbacks/' + route.query.feedbackId, { extraInfo: detailedGoodReview.value })
-      //   .then(response => {
-      //     console.log('thankyou, good: ', response)
-      //   })
-      //   .catch(error => {
-      //     console.error(error)
-      //   })
+      api
+        .put('/feedbacks/' + route.query.feedbackId, { extraInfo: detailedGoodReview.value })
+        .then(response => {
+          // console.log('thankyou, good: ', response)
+        })
+        .catch(error => {
+          console.error(error)
+        })
     }
-
-    const $q = useQuasar()
 
     return {
       reviewType,
