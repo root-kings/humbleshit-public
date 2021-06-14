@@ -20,8 +20,8 @@
             class="q-mb-md"
             :rules="[val => (val && val.length > 0) || 'Please select an option']"
         />
-        <q-input v-if="userFeedbackObj.userType == 'Other...'"
-            v-model="userFeedbackObj.otherUserType"
+        <q-input v-if="userFeedbackObj.userType == 'Other'"
+            v-model="userFeedbackObj.userSubType"
             outlined
             label="Name"
             lazy-rules
@@ -86,7 +86,7 @@ export default defineComponent({
     const userFeedbackObj = reactive({
         'facility': null,
         'userType': null,
-        'otherUserType': null,
+        'userSubType': null,
         'reviewType': ''
     })
 
@@ -95,7 +95,7 @@ export default defineComponent({
         'Bystander',
         'Doctor',
         'Nurse',
-        'Other...',
+        'Other',
     ]);
 
     const happyFace = ref(require('../assets/happy-face.png'))
