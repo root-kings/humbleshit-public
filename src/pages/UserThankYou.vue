@@ -90,7 +90,6 @@
 <script>
 import { Vue, defineComponent, ref, reactive, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
-import { useQuasar } from 'quasar'
 import { useRoute } from "vue-router";
 import { api, fetcher } from 'boot/axios'
 
