@@ -1,6 +1,10 @@
 export default function() {
   return {
     title: 'humbleShit',
+    lastFeedback: {
+      feedbackId: null,
+      timestamp: null
+    },
 
     navigationLinks: [
       {

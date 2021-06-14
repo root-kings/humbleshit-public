@@ -1,5 +1,5 @@
-import sadFeedbacksList from "../../utils/sadFeedbacks";
-import happyFeedbacksList from "../../utils/happyFeedbacks";
+import sadFeedbacksList from '../../utils/sadFeedbacks'
+import happyFeedbacksList from '../../utils/happyFeedbacks'
 
 export function navigationLinks({ navigationLinks }) {
   return navigationLinks
@@ -11,6 +11,10 @@ export function menuLinks({ menuLinks }) {
 
 export function title({ title }) {
   return title
+}
+
+export function lastFeedback({ lastFeedback }) {
+  return lastFeedback
 }
 
 export function sadFeedbacks() {

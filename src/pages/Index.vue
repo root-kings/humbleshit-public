@@ -67,7 +67,8 @@ import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
 import { api, fetcher } from 'boot/axios'
 import { useRouter } from "vue-router";
-import useSWRV from 'swrv'
+import moment from 'moment-timezone';
+// import useSWRV from 'swrv'
 
 
 export default defineComponent({
@@ -102,58 +103,69 @@ export default defineComponent({
     const happyFace = ref(require('../assets/happy-face.png'))
     const sadFace = ref(require('../assets/sad-face.png'))
 
+    let lastFeedback = computed(() => $store.getters['general/lastFeedback'])
+
     const getUserFeedback = (event) => {
+      let now = new moment().tz('Asia/Kolkata');
+      let sendableTime = now.subtract(15, 'minute')
+      if (!lastFeedback.value.timestamp || sendableTime.isAfter(lastFeedback.value.timestamp)) {
+        // allowSending
+      }
+      else {
+        // show error
+      }
 
         userFeedbackObj.reviewType = event;
-        if (event == 'bad'){
-          $router.push({
-            name: "sadfeedback",
-            query: { 
-              key: event,
-              feedbackId: 'feedback_id_bad',
-              }
-          })
-        } 
-        if (event == 'good'){
-          $router.push({
-            name: "happyfeedback",
-            query: {
-              key: event,
-              feedbackId: 'feedback_id_good',
-            }
-          })
-        }
-        // api
-        //   .post('/feedbacks', userFeedbackObj)
-        //   // .get('/feedbacks/60c5ca2468e16bd52c1de51f') // good
-        //   // .get('/feedbacks/60c60214ca6234f8e76385e8') // bad
-        //   .then(response => {
-        //     console.log("resp: ", response)
-        //     const feedbackId = response.data.id;
-        //     if(response.status == 200) {
-        //       if (event == 'bad'){
-        //         $router.push({
-        //           name: "sadfeedback",
-        //           query: { 
-        //             key: event,
-        //             feedbackId: feedbackId,
-        //            }
-        //         })
-        //       } 
-        //       if (event == 'good'){
-        //         $router.push({
-        //           name: "happyfeedback",
-        //           query: {
-        //             key: event,
-        //             feedbackId: feedbackId,
-        //           }
-        //         })
+        // if (event == 'bad'){
+        //   $router.push({
+        //     name: "sadfeedback",
+        //     query: { 
+        //       key: event,
+        //       feedbackId: 'feedback_id_bad',
         //       }
+        //   })
+        // } 
+        // if (event == 'good'){
+        //   $router.push({
+        //     name: "happyfeedback",
+        //     query: {
+        //       key: event,
+        //       feedbackId: 'feedback_id_good',
         //     }
         //   })
-        //   .catch(error => {
-        //     console.error(error)
-        //   })
+        // }
+        api
+          // .post('/feedbacks', userFeedbackObj)
+          .get('/feedbacks/60c5ca2468e16bd52c1de51f') // good
+          // .get('/feedbacks/60c60214ca6234f8e76385e8') // bad
+          .then(response => {
+            console.log("resp: ", response)
+            const feedbackId = response.data.id;
+            $store.dispatch('general/setLastFeedback', { feedbackId, timestamp: now })
+            if(response.status == 200) {
+              if (event == 'bad'){
+                $router.push({
+                  name: "sadfeedback",
+                  query: { 
+                    key: event,
+                    feedbackId: feedbackId,
+                   }
+                })
+              } 
+              if (event == 'good'){
+                $router.push({
+                  name: "happyfeedback",
+                  query: {
+                    key: event,
+                    feedbackId: feedbackId,
+                  }
+                })
+              }
+            }
+          })
+          .catch(error => {
+            console.error(error)
+          })
     }
 
 

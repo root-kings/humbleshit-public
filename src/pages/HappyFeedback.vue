@@ -202,13 +202,13 @@ export default defineComponent({
       let takenFeedback = []
       for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(happyFeedbackOptions[idx])
       happyFeedbackInfo.feedbacks = takenFeedback;
-      $router.push({
-        name: "thankyou",
-        query: { 
-          key: route.query.key,
-          feedbackId: route.query.feedbackId,
-          }
-      })
+      // $router.push({
+      //   name: "thankyou",
+      //   query: { 
+      //     key: route.query.key,
+      //     feedbackId: route.query.feedbackId,
+      //     }
+      // })
 
       // api
       //   .put('/feedbacks/' + route.query.feedbackId, { happyFeedbackInfo: happyFeedbackInfo })
