@@ -99,11 +99,11 @@ export default defineComponent({
 
   setup() {
 
-    const route = useRoute();
+    const $route = useRoute();
     const $store = useStore()
 
     let reviewType = computed(() => {
-      return route.query.key
+      return $route.query.key
     })
 
     onMounted(() => {
@@ -115,12 +115,12 @@ export default defineComponent({
     let thankYouMessage = ref('')
     const thankYouPlane = ref(require('../assets/paper-plane-100.png'))
     if (reviewType.value == 'good') thankYouMessage.value = 'Your review has been submitted to the administration.';
-    else if (reviewType.value == 'bad') thankYouMessage.value = 'Your issue #' + route.query.feedbackId + ' has been submitted to the administration';
+    else if (reviewType.value == 'bad') thankYouMessage.value = 'Your issue #' + $route.query.feedbackId + ' has been submitted to the administration';
 
     const contactHousekeeping = () => {}
     const getFollowUp = () => {
       api
-        .put('/feedbacks/' + route.query.feedbackId, { extraInfo: detailedSadReview.value })
+        .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedSadReview.value })
         .then(response => {
           // console.log('thankyou, bad: ', response)
         })
@@ -130,7 +130,7 @@ export default defineComponent({
     }
     const onSave = () => {
       api
-        .put('/feedbacks/' + route.query.feedbackId, { extraInfo: detailedGoodReview.value })
+        .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedGoodReview.value })
         .then(response => {
           // console.log('thankyou, good: ', response)
         })

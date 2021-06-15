@@ -5,3 +5,7 @@ export function setTitle({ commit }, title) {
 export function setLastFeedback({ commit }, lastFeedback) {
   commit('setLastFeedback', lastFeedback)
 }
+
+export function setFacilityName({ commit }, facilityName) {
+  commit('setFacilityName', facilityName)
+}

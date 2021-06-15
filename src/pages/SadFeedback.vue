@@ -4,7 +4,7 @@
       <div class="q-mb-md text-center text-h4">Rate this washroom</div>
 
       <div class="q-mt-md text-center text-h6 text-weight-regular">
-        {{ location }}
+        {{ facilityName }}
       </div>
     </q-card-section>
 
@@ -59,7 +59,7 @@
       <q-card-section>
         <div class="q-pt-md row justify-center">
           <div class="col-12">
-            <q-form>
+            <q-form ref="sadFeedbackForm">
               <div class="q-pt-xs">
                 <r-input-file
                   v-model="sadFeedbackInfo.attachment"
@@ -123,31 +123,33 @@
       </q-card-section>
       <q-dialog v-model="dialog" position="bottom">
         <q-card class="full-width">
-          <q-card-section class>
-            <q-input
-              v-model="otp"
-              outlined
-              label="Enter OTP"
-              lazy-rules
-              :rules="[
-                (val) =>
-                  (val !== null && val !== '' && val.length > 5) ||
-                  'Please enter a valid 6-digit OTP',
-              ]"
-              mask="######"
-            />
-            <div class="row q-pa-sm justify-center">
-              <div class="col-md-6 col-xs-12">
-                <q-btn
-                  rounded
-                  class="full-width"
-                  color="primary"
-                  label="Submit"
-                  icon="check"
-                  @click="onSubmit"
-                />
+          <q-card-section>
+            <q-form ref="inputOTP">
+              <q-input
+                v-model="otp"
+                outlined
+                label="Enter OTP"
+                lazy-rules
+                :rules="[
+                  (val) =>
+                    (val !== null && val !== '' && val.length > 5) ||
+                    'Please enter a valid 6-digit OTP',
+                ]"
+                mask="######"
+              />
+              <div class="row q-pa-sm justify-center">
+                <div class="col-md-6 col-xs-12">
+                  <q-btn
+                    rounded
+                    class="full-width"
+                    color="primary"
+                    label="Submit"
+                    icon="check"
+                    @click="onSubmit"
+                  />
+                </div>
               </div>
-            </div>
+            </q-form>
           </q-card-section>
         </q-card>
       </q-dialog>
@@ -170,7 +172,7 @@ export default defineComponent({
 
   setup() {
     const $store = useStore();
-    const route = useRoute();
+    const $route = useRoute();
     const $router = useRouter();
 
     onMounted(() => {
@@ -178,6 +180,7 @@ export default defineComponent({
     });
 
     let sadFeedbackOptions = ref(computed(() => $store.getters['general/sadFeedbacks'])).value
+    let facilityName = computed(() => $store.getters['general/facilityName'])
 
     let sadFeedbackInfo = reactive({
       name: null,
@@ -190,36 +193,45 @@ export default defineComponent({
     let dialog = ref(false);
     let otp = ref("");
     let selectedFeedback = ref(Array(sadFeedbackOptions.length).fill(false));
-    let location = ref("AIIMS Patna. Washroom 7");
 
     let happyFaceDisabled = ref(require("../assets/happy-face-disabled.png"));
     let sadFace = ref(require("../assets/sad-face.png"));
+    const sadFeedbackForm = ref(null)
+    const inputOTP = ref(null)
 
     const verifyOTP = () => {
-      dialog.value = true;
+      sadFeedbackForm.value.validate().then(isValidated => {
+        if (isValidated) {
+          dialog.value = true;
+        }
+      })
     };
     const onSubmit = () => {
-      let takenFeedback = []
-      for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(sadFeedbackOptions[idx])
-      sadFeedbackInfo.feedbacks = takenFeedback;
-      api
-        .put('/feedbacks/' + route.query.feedbackId, { sadFeedbackInfo: sadFeedbackInfo })
-        .then(response => {
-          // console.log(response)
-          if(response.status == 200) {
-            $router.push({
-              name: "thankyou",
-              query: { 
-                key: route.query.key,
-                feedbackId: route.query.feedbackId,
-                }
+      inputOTP.value.validate().then(isValidated => {
+        if (isValidated) {
+          let takenFeedback = []
+          for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(sadFeedbackOptions[idx])
+          sadFeedbackInfo.feedbacks = takenFeedback;
+          api
+            .put('/feedbacks/' + $route.query.feedbackId, { sadFeedbackInfo: sadFeedbackInfo })
+            .then(response => {
+              // console.log(response)
+              if(response.status == 200) {
+                $router.push({
+                  name: "thankyou",
+                  query: { 
+                    key: $route.query.key,
+                    feedbackId: $route.query.feedbackId,
+                    }
+                })
+              }
             })
-          }
-        })
-        .catch(error => {
-          console.error(error)
-        })
-      dialog.value = false
+            .catch(error => {
+              console.error(error)
+            })
+          dialog.value = false
+        }
+      })
     };
 
     return {
@@ -231,7 +243,9 @@ export default defineComponent({
       sadFace,
       sadFeedbackOptions,
       selectedFeedback,
-      location,
+      facilityName,
+      sadFeedbackForm,
+      inputOTP,
       onSubmit,
       verifyOTP,
     };

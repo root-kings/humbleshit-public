@@ -4,7 +4,7 @@
         <div class="q-mb-md text-center text-h4">Rate this washroom</div>
 
         <div class="q-mt-md text-center text-h6 text-weight-regular">
-            AIIMS Patna. Washroom 7
+            {{ facilityName }}
         </div>
     </q-card-section>
 
@@ -12,51 +12,52 @@
         <div class="q-mt-md text-dark text-weight-medium">
             What defines you best?
         </div>
-        <q-select
-            v-model="userFeedbackObj.userType"
-            outlined
-            :options="userTypeList"
-            label="I am"
-            class="q-mb-md"
-            :rules="[val => (val && val.length > 0) || 'Please select an option']"
-        />
-        <q-input v-if="userFeedbackObj.userType == 'Other'"
-            v-model="userFeedbackObj.userSubType"
-            outlined
-            label="Name"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please type something']"
-        />
-        <div class="q-mt-xl row items-center justify-evenly">
-            <q-card
-              bordered
-              class="happy-card cursor-pointer text-center"
-            >
+        <q-form ref="userForm">
+          <q-select
+              v-model="userFeedbackObj.userType"
+              outlined
+              :options="userTypeList"
+              label="I am"
+              class="q-mb-md"
+              :rules="[val => (val && val.length > 0) || 'Please select an option']"
+          />
+          <q-input v-if="userFeedbackObj.userType == 'Other'"
+              v-model="userFeedbackObj.userSubType"
+              outlined
+              label="Name"
+              lazy-rules
+              :rules="[val => (val && val.length > 0) || 'Please type something']"
+          />
+          <div class="q-mt-xl row items-center justify-evenly">
+              <q-card
+                bordered
+                class="happy-card cursor-pointer text-center"
+              >
+                <span>
+                    <q-img
+                        height="7rem"
+                        width="7rem"
+                        :src="happyFace"
+                        @click="getUserFeedback('good')"
+                    />
+                </span>
+              </q-card>
+              <q-card
+                bordered
+                class="sad-card cursor-pointer text-center"
+              >
               <span>
                   <q-img
                       height="7rem"
                       width="7rem"
-                      :src="happyFace"
-                      @click="getUserFeedback('good')"
+                      :src="sadFace"
+                      @click="getUserFeedback('bad')"
                   />
               </span>
-            </q-card>
-            <q-card
-              bordered
-              class="sad-card cursor-pointer text-center"
-            >
-            <span>
-                <q-img
-                    height="7rem"
-                    width="7rem"
-                    :src="sadFace"
-                    @click="getUserFeedback('bad')"
-                />
-            </span>
-            </q-card>
-          
-        </div>
-        
+              </q-card>
+            
+          </div>
+        </q-form>
     </q-card-section>
   </q-page>
 </template>
@@ -66,7 +67,7 @@ import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
 import { api, fetcher } from 'boot/axios'
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import moment from 'moment-timezone';
 
 
@@ -78,6 +79,30 @@ export default defineComponent({
     const $q = useQuasar()
     const $store = useStore()
     const $router = useRouter();
+    const $route = useRoute();
+    
+    if ($route.query.facility) {
+      api
+        .get('/facilities/' + $route.query.facility)
+        .then(response => {
+          console.log(response)
+          if (response.data) $store.dispatch('general/setFacilityName', response.data.name)
+          else {
+            console.log("QR Code is not active anymore.")
+            $store.dispatch('general/setFacilityName', '')
+          }
+        })
+        .catch(error => {
+          console.log("QR Code is not active anymore.")
+          $store.dispatch('general/setFacilityName', '')
+          console.error(error)
+        })
+    }
+    else {
+      console.log("QR Code is not active anymore.")
+      $store.dispatch('general/setFacilityName', '')
+    }
+    let facilityName = computed(() => $store.getters['general/facilityName'])
 
     onMounted(() => {
       $store.dispatch('general/setTitle', 'humbleShit')
@@ -98,50 +123,58 @@ export default defineComponent({
         'Other',
     ]);
 
+    const userForm = ref(null)
     const happyFace = ref(require('../assets/happy-face.png'))
     const sadFace = ref(require('../assets/sad-face.png'))
 
     let lastFeedback = computed(() => $store.getters['general/lastFeedback'])
 
     const getUserFeedback = (event) => {
-      let now = new moment().tz('Asia/Kolkata');
-      let sendableTime = now.subtract(15, 'minute')
-      if (!lastFeedback.value.timestamp || sendableTime.isAfter(lastFeedback.value.timestamp)) {
-        userFeedbackObj.reviewType = event;
-        api
-          .post('/feedbacks', userFeedbackObj)
-          .then(response => {
-            // console.log("resp: ", response)
-            const feedbackId = response.data.id;
-            $store.dispatch('general/setLastFeedback', { feedbackId, timestamp: now })
-            if(response.status == 200) {
-              if (event == 'bad'){
-                $router.push({
-                  name: "sadfeedback",
-                  query: { 
-                    key: event,
-                    feedbackId: feedbackId,
-                   }
-                })
-              } 
-              if (event == 'good'){
-                $router.push({
-                  name: "happyfeedback",
-                  query: {
-                    key: event,
-                    feedbackId: feedbackId,
+      userForm.value.validate().then(isValidated => {
+        if (isValidated) {
+          let now = new moment().tz('Asia/Kolkata');
+          let sendableTime = now.subtract(15, 'minute')
+          if (!lastFeedback.value.timestamp || sendableTime.isAfter(lastFeedback.value.timestamp)) {
+            userFeedbackObj.reviewType = event;
+            userFeedbackObj.facility = $route.query.facility;
+            api
+              .post('/feedbacks', userFeedbackObj)
+              .then(response => {
+                // console.log("resp: ", response)
+                const feedbackId = response.data.id;
+                $store.dispatch('general/setLastFeedback', { feedbackId, timestamp: now })
+                if(response.status == 200) {
+                  if (event == 'bad'){
+                    $router.push({
+                      name: "sadfeedback",
+                      query: { 
+                        key: event,
+                        feedbackId: feedbackId,
+                       }
+                    })
+                  } 
+                  if (event == 'good'){
+                    $router.push({
+                      name: "happyfeedback",
+                      query: {
+                        key: event,
+                        feedbackId: feedbackId,
+                      }
+                    })
                   }
-                })
-              }
-            }
-          })
-          .catch(error => {
-            console.error(error)
-          })
-      }
-      else {
-        console.log("Your feedback has already been recorded. Please come after sometimes.")
-      }
+                }
+              })
+              .catch(error => {
+                console.error(error)
+              })
+          }
+          else {
+            console.log("Your feedback has already been recorded. Please come after sometimes.")
+          }
+          
+        }
+        
+      })
     }
 
     return {
@@ -149,6 +182,8 @@ export default defineComponent({
         userTypeList,
         happyFace,
         sadFace,
+        facilityName,
+        userForm,
         getUserFeedback,
     }
   }

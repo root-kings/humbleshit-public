@@ -4,7 +4,7 @@
       <div class="q-mb-md text-center text-h4">Rate this washroom</div>
 
       <div class="q-mt-md text-center text-h6 text-weight-regular">
-        {{ location }}
+        {{ facilityName }}
       </div>
     </q-card-section>
 
@@ -59,7 +59,7 @@
       <q-card-section>
         <div class="q-pt-md row justify-center">
           <div class="col-12">
-            <q-form>
+            <q-form ref="happyFeedbackForm">
               <div class="q-pt-xs text-center">
                 <div class="text-h6 text-weight-regular">
                   Rate this toilet
@@ -123,31 +123,33 @@
       </q-card-section>
       <q-dialog v-model="dialog" position="bottom">
         <q-card class="full-width">
-          <q-card-section class>
-            <q-input
-              v-model="otp"
-              outlined
-              label="Enter OTP"
-              lazy-rules
-              :rules="[
-                (val) =>
-                  (val !== null && val !== '' && val.length > 5) ||
-                  'Please enter a valid 6-digit OTP',
-              ]"
-              mask="######"
-            />
-            <div class="row q-pa-sm justify-center">
-              <div class="col-md-6 col-xs-12">
-                <q-btn
-                  rounded
-                  class="full-width"
-                  color="primary"
-                  label="Submit"
-                  icon="check"
-                  @click="onSubmit"
-                />
+          <q-card-section>
+            <q-form ref="inputOTP">
+              <q-input
+                v-model="otp"
+                outlined
+                label="Enter OTP"
+                lazy-rules
+                :rules="[
+                  (val) =>
+                    (val !== null && val !== '' && val.length > 5) ||
+                    'Please enter a valid 6-digit OTP',
+                ]"
+                mask="######"
+              />
+              <div class="row q-pa-sm justify-center">
+                <div class="col-md-6 col-xs-12">
+                  <q-btn
+                    rounded
+                    class="full-width"
+                    color="primary"
+                    label="Submit"
+                    icon="check"
+                    @click="onSubmit"
+                  />
+                </div>
               </div>
-            </div>
+            </q-form>
           </q-card-section>
         </q-card>
       </q-dialog>
@@ -168,15 +170,15 @@ export default defineComponent({
 
   setup() {
     const $store = useStore()
-    const route = useRoute();
+    const $route = useRoute();
     const $router = useRouter();
 
     onMounted(() => {
       $store.dispatch('general/setTitle', 'humbleShit')
-      console.log('happy route : ', route.query)
     })
 
     let happyFeedbackOptions = ref(computed(() => $store.getters['general/happyFeedbacks'])).value
+    let facilityName = computed(() => $store.getters['general/facilityName'])
 
     let happyFeedbackInfo = reactive({
       name: null,
@@ -189,36 +191,45 @@ export default defineComponent({
     let dialog = ref(false);
     let otp = ref("");
     const selectedFeedback = ref(Array(happyFeedbackOptions.length).fill(false))
-    const location = ref('AIIMS Patna. Washroom 7')
 
     const sadFaceDisabled = ref(require('../assets/sad-face-disabled.png'))
     const happyFace = ref(require('../assets/happy-face.png'))
+    const inputOTP = ref(null);
+    const happyFeedbackForm = ref(null);
 
     const verifyOTP = () => {
-      dialog.value = true;
+      happyFeedbackForm.value.validate().then(isValidated => {
+        if (isValidated) {
+          dialog.value = true;
+        }
+      })
     };
     const onSubmit = () => {
-      let takenFeedback = []
-      for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(happyFeedbackOptions[idx])
-      happyFeedbackInfo.feedbacks = takenFeedback;
-      api
-        .put('/feedbacks/' + route.query.feedbackId, { happyFeedbackInfo: happyFeedbackInfo })
-        .then(response => {
-          // console.log(response)
-          if(response.status == 200) {
-            $router.push({
-              name: "thankyou",
-              query: { 
-                key: route.query.key,
-                feedbackId: route.query.feedbackId,
-                }
+      inputOTP.value.validate().then(isValidated => {
+        if (isValidated) {
+          let takenFeedback = []
+          for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(happyFeedbackOptions[idx])
+          happyFeedbackInfo.feedbacks = takenFeedback;
+          api
+            .put('/feedbacks/' + $route.query.feedbackId, { happyFeedbackInfo: happyFeedbackInfo })
+            .then(response => {
+              // console.log(response)
+              if(response.status == 200) {
+                $router.push({
+                  name: "thankyou",
+                  query: { 
+                    key: $route.query.key,
+                    feedbackId: $route.query.feedbackId,
+                    }
+                })
+              }
             })
-          }
-        })
-        .catch(error => {
-          console.error(error)
-        })
-      dialog.value = false
+            .catch(error => {
+              console.error(error)
+            })
+          dialog.value = false
+        }
+      })
     };
 
     return {
@@ -228,8 +239,10 @@ export default defineComponent({
       happyFace,
       happyFeedbackOptions,
       selectedFeedback,
-      location,
       happyFeedbackInfo,
+      facilityName,
+      happyFeedbackForm,
+      inputOTP,
       onSubmit,
       verifyOTP,
     }

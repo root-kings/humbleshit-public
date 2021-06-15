@@ -5,15 +5,15 @@ const routes = [
     children: [
       {
         path: '',
-        redirect: '/home'
+        redirect: '/feedback?facility=6093d438ea10a9000401cf'
       },
       {
         path: 'about',
         component: () => import('pages/About.vue')
       },
       {
-        name: 'home',
-        path: 'home',
+        name: 'feedback',
+        path: 'feedback',
         component: () => import('pages/Index.vue')
       },
       {

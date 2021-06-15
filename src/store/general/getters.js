@@ -17,6 +17,10 @@ export function lastFeedback({ lastFeedback }) {
   return lastFeedback
 }
 
+export function facilityName({ facilityName }) {
+  return facilityName
+}
+
 export function sadFeedbacks() {
   return sadFeedbacksList
 }
