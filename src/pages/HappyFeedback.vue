@@ -128,12 +128,12 @@
               <q-input
                 v-model="otp"
                 outlined
-                label="Enter OTP"
+                label="Enter Secret Code"
                 lazy-rules
                 :rules="[
                   (val) =>
                     (val !== null && val !== '' && val.length > 5) ||
-                    'Please enter a valid 6-digit OTP',
+                    'Please enter a valid 6-digit code',
                 ]"
                 mask="######"
               />
