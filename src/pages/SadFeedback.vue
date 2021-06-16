@@ -62,7 +62,7 @@
             <q-form ref="sadFeedbackForm">
               <div class="q-pt-xs">
                 <r-input-file
-                  v-model="sadFeedbackInfo.attachment"
+                  v-model="sadFeedbackInfo.image"
                   label="Attach a photo"
                 />
               </div>
@@ -184,7 +184,7 @@ export default defineComponent({
 
     let sadFeedbackInfo = reactive({
       name: null,
-      attachment: null,
+      image: null,
       _id: null,
       isImmediateService: ref(false),
       phone: null,

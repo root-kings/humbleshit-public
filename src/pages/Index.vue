@@ -59,6 +59,26 @@
           </div>
         </q-form>
     </q-card-section>
+    <q-dialog v-model="holdingFeedbackDialog" position="bottom">
+      <q-card class="full-width">
+        <q-card-section>
+          <div class="row justify-center">
+            <span class="q-pb-sm text-subtitle2">Your feedback has already been recorded. Please try again after sometimes.</span>
+            <div class="col-md-6 col-xs-12">
+              <q-btn
+                rounded
+                class="full-width"
+                color="primary"
+                label="Close"
+                icon="check"
+                @click="onClose"
+              />
+            </div>
+          </div>          
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
   </q-page>
 </template>
 
@@ -125,15 +145,19 @@ export default defineComponent({
     const userForm = ref(null)
     const happyFace = ref(require('../assets/happy-face.png'))
     const sadFace = ref(require('../assets/sad-face.png'))
+    const holdTime = ref(900000)
+    const holdingFeedbackDialog = ref(false);
 
     let lastFeedback = computed(() => $store.getters['general/lastFeedback'])
 
     const getUserFeedback = (event) => {
       userForm.value.validate().then(isValidated => {
         if (isValidated) {
-          let now = new moment().tz('Asia/Kolkata');
-          let sendableTime = now.subtract(15, 'minute')
-          if (!lastFeedback.value.timestamp || sendableTime.isAfter(lastFeedback.value.timestamp)) {
+          // let now = new moment().tz('Asia/Kolkata');
+          let now = + new Date();
+          // let sendableTime = now.subtract(15, 'minutes')
+          // if (!lastFeedback.value.timestamp || sendableTime.isAfter(lastFeedback.value.timestamp)) {
+          if (!lastFeedback.value.timestamp || (now - lastFeedback.value.timestamp) > holdTime.value) {
             userFeedbackObj.reviewType = event;
             userFeedbackObj.facility = $route.query.facility;
             api
@@ -168,12 +192,17 @@ export default defineComponent({
               })
           }
           else {
+            holdingFeedbackDialog.value = true;
             console.log("Your feedback has already been recorded. Please come after sometimes.")
           }
           
         }
         
       })
+    }
+
+    const onClose = () => {
+      holdingFeedbackDialog.value = false;
     }
 
     return {
@@ -183,6 +212,8 @@ export default defineComponent({
         sadFace,
         facilityName,
         userForm,
+        holdingFeedbackDialog,
+        onClose,
         getUserFeedback,
     }
   }
