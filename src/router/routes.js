@@ -5,7 +5,7 @@ const routes = [
     children: [
       {
         path: '',
-        redirect: '/feedback?facility=6093d438ea10a9000401cf'
+        redirect: '/feedback'
       },
       {
         path: 'about',

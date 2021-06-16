@@ -84,6 +84,58 @@
         </div>
       </div>
     </q-card-section>
+    <q-dialog v-model="callDialog" position="bottom">
+      <q-card class="full-width">
+        <q-card-section class="q-pt-md q-pb-md">
+          <div class="row justify-center">
+            <q-item-section avatar>
+              <q-avatar>
+                <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+              </q-avatar>
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label>
+                Sahas
+              </q-item-label>
+              <q-item-label caption>
+                Supervisor
+              </q-item-label>
+            </q-item-section>
+
+            <q-item-section side>
+              <q-btn
+                type="a"
+                :href="`tel:9380546475`"
+                color="primary"
+                flat
+                round
+                icon="eva-phone-outline"
+              />
+            </q-item-section>
+          </div>          
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+    <q-dialog v-model="submitDialog" position="bottom">
+      <q-card class="full-width">
+        <q-card-section>
+          <div class="row justify-center">
+            <span class="q-pb-sm text-subtitle2">Thanks! Your response has been submitted.</span>
+            <div class="col-md-6 col-xs-12">
+              <q-btn
+                rounded
+                class="full-width"
+                color="primary"
+                label="Close"
+                icon="check"
+                @click="onClose"
+              />
+            </div>
+          </div>          
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -113,15 +165,21 @@ export default defineComponent({
     let detailedGoodReview = ref('')
     let detailedSadReview = ref('')
     let thankYouMessage = ref('')
+    let submitDialog = ref(false);
+    let callDialog = ref(false);
     const thankYouPlane = ref(require('../assets/paper-plane-100.png'))
     if (reviewType.value == 'good') thankYouMessage.value = 'Your review has been submitted to the administration.';
     else if (reviewType.value == 'bad') thankYouMessage.value = 'Your issue #' + $route.query.feedbackId + ' has been submitted to the administration';
 
-    const contactHousekeeping = () => {}
+    const contactHousekeeping = () => {
+      callDialog.value = true;
+    }
     const getFollowUp = () => {
       api
-        .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedSadReview.value })
+        .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedSadReview.value.trim() })
         .then(response => {
+          if (detailedSadReview.value.trim()) submitDialog.value = true;
+          detailedSadReview.value = ''
           // console.log('thankyou, bad: ', response)
         })
         .catch(error => {
@@ -130,13 +188,19 @@ export default defineComponent({
     }
     const onSave = () => {
       api
-        .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedGoodReview.value })
+        .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedGoodReview.value.trim() })
         .then(response => {
+          if (detailedGoodReview.value.trim()) submitDialog.value = true;
+          detailedGoodReview.value = ''
           // console.log('thankyou, good: ', response)
         })
         .catch(error => {
           console.error(error)
         })
+    }
+
+    const onClose = () => {
+      submitDialog.value = false;
     }
 
     return {
@@ -145,9 +209,12 @@ export default defineComponent({
       detailedGoodReview,
       thankYouPlane,
       thankYouMessage,
+      submitDialog,
+      callDialog,
       contactHousekeeping,
       getFollowUp,
-      onSave
+      onSave,
+      onClose
     }
   }
 })

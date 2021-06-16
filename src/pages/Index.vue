@@ -85,7 +85,6 @@ export default defineComponent({
       api
         .get('/facilities/' + $route.query.facility)
         .then(response => {
-          console.log(response)
           if (response.data) $store.dispatch('general/setFacilityName', response.data.name)
           else {
             console.log("QR Code is not active anymore.")
