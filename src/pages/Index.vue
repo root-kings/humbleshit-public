@@ -100,26 +100,26 @@ export default defineComponent({
     const $store = useStore()
     const $router = useRouter();
     const $route = useRoute();
-    
+
     if ($route.query.facility) {
       api
         .get('/facilities/' + $route.query.facility)
         .then(response => {
           if (response.data) $store.dispatch('general/setFacilityName', response.data.name)
           else {
-            console.log("QR Code is not active anymore.")
             $store.dispatch('general/setFacilityName', '')
+            $router.push({ name: "qrcodeerror" })
           }
         })
         .catch(error => {
-          console.log("QR Code is not active anymore.")
           $store.dispatch('general/setFacilityName', '')
+          $router.push({ name: "qrcodeerror" })
           console.error(error)
         })
     }
     else {
-      console.log("QR Code is not active anymore.")
       $store.dispatch('general/setFacilityName', '')
+      $router.push({ name: "qrcodeerror" })
     }
     let facilityName = computed(() => $store.getters['general/facilityName'])
 

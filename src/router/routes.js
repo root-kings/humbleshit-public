@@ -42,6 +42,11 @@ const routes = [
         component: () => import('src/pages/HappyFeedback.vue')
       },
       {
+        name: 'qrcodeerror',
+        path: 'qrcodeerror',
+        component: () => import('src/pages/QRCodeError.vue')
+      },
+      {
         name: 'thankyou',
         path: 'thankyou',
         component: () => import('src/pages/UserThankYou.vue')
