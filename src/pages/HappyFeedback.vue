@@ -105,7 +105,19 @@
                 This is to verify the authenticity of your feedback, data will
                 remain private
               </div>
-              <div class="row q-pt-md justify-center">
+              <div class="row q-pa-sm justify-center">
+                <div class="col-md-6 col-xs-12">
+                  <q-btn
+                    rounded
+                    class="full-width"
+                    color="primary"
+                    label="Submit"
+                    icon="check"
+                    @click="onSubmit"
+                  />
+                </div>
+              </div>
+              <!-- <div class="row q-pt-md justify-center">
                 <div class="col-md-6 col-xs-12">
                   <q-btn
                     rounded
@@ -116,7 +128,7 @@
                     @click="verifyOTP"
                   />
                 </div>
-              </div>
+              </div> -->
             </q-form>
           </div>
         </div>
@@ -205,7 +217,7 @@ export default defineComponent({
       })
     };
     const onSubmit = () => {
-      inputOTP.value.validate().then(isValidated => {
+      happyFeedbackForm.value.validate().then(isValidated => {
         if (isValidated) {
           let takenFeedback = []
           for(const idx in selectedFeedback.value) if(selectedFeedback.value[idx]) takenFeedback.push(happyFeedbackOptions[idx])

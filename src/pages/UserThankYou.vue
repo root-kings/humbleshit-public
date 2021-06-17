@@ -44,6 +44,16 @@
               />
             </div>
             <div v-if="reviewType == 'bad'" class="row text-center q-pt-md">
+              <div class="col-12 q-pa-xs">
+                <q-btn
+                  rounded
+                  class="full-width"
+                  label="Submit"
+                  color="primary"
+                  icon="check"
+                  @click="getFollowUp('submit')"
+                />
+              </div>
               <div class="col-6 q-pa-xs">
                 <q-btn
                   rounded
@@ -63,7 +73,7 @@
                   color="positive"
                   label="Follow Up"
                   icon="eva-message-circle-outline"
-                  @click="getFollowUp"
+                  @click="getFollowUp('followUp')"
                 />
                 <span class="text-caption text-weight-regular text-blue-grey-5">to get SMS updates</span>
               </div>
@@ -121,7 +131,7 @@
       <q-card class="full-width">
         <q-card-section>
           <div class="row justify-center">
-            <span class="q-pb-sm text-subtitle2">Thanks! Your response has been submitted.</span>
+            <span class="q-pb-sm text-subtitle2">{{ finalMessage }}</span>
             <div class="col-md-6 col-xs-12">
               <q-btn
                 rounded
@@ -170,33 +180,59 @@ export default defineComponent({
     const thankYouPlane = ref(require('../assets/paper-plane-100.png'))
     if (reviewType.value == 'good') thankYouMessage.value = 'Your review has been submitted to the administration.';
     else if (reviewType.value == 'bad') thankYouMessage.value = 'Your issue #' + $route.query.feedbackId + ' has been submitted to the administration';
+    let finalMessage = ref('');
+    let followUp = ref(false)
 
+    const finalSubmit = (event) => {
+      // console.log(detailedSadReview.value.length)
+      if (detailedSadReview.value.length) {
+        api
+          .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedSadReview.value.trim(), followUp: followUp.value })
+          .then(response => {
+            detailedSadReview.value = ''
+            // console.log('thankyou, bad: ', response)
+          })
+          .catch(error => {
+            console.error(error)
+          })
+      }
+      if(event != 'call') submitDialog.value = true;
+    }
+
+    const getFollowUp = (event) => {
+      if (event == 'submit') {
+        finalMessage.value = "Thanks! your response has been recorded."
+        finalSubmit('')
+      }
+      if (event == 'followUp') {
+        finalMessage.value = "Thanks! your response has been recorded. You will get a message when we get it resolved."
+        followUp.value = true;
+        finalSubmit('')
+      }
+      if (event == 'call') {
+        finalSubmit('call')
+      }
+    }
     const contactHousekeeping = () => {
       callDialog.value = true;
+      getFollowUp('call')
     }
-    const getFollowUp = () => {
-      api
-        .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedSadReview.value.trim() })
-        .then(response => {
-          if (detailedSadReview.value.trim()) submitDialog.value = true;
-          detailedSadReview.value = ''
-          // console.log('thankyou, bad: ', response)
-        })
-        .catch(error => {
-          console.error(error)
-        })
-    }
+
     const onSave = () => {
-      api
-        .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedGoodReview.value.trim() })
-        .then(response => {
-          if (detailedGoodReview.value.trim()) submitDialog.value = true;
-          detailedGoodReview.value = ''
-          // console.log('thankyou, good: ', response)
-        })
-        .catch(error => {
-          console.error(error)
-        })
+      if (detailedGoodReview.value.length) {
+        api
+          .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedGoodReview.value.trim() })
+          .then(response => {
+            submitDialog.value = true;
+            detailedGoodReview.value = ''
+            finalMessage.value = "Thanks! your response has been recorded."
+            // console.log('thankyou, good: ', response)
+          })
+          .catch(error => {
+            console.error(error)
+          })
+
+      }
     }
 
     const onClose = () => {
@@ -211,6 +247,7 @@ export default defineComponent({
       thankYouMessage,
       submitDialog,
       callDialog,
+      finalMessage,
       contactHousekeeping,
       getFollowUp,
       onSave,

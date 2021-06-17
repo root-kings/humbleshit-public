@@ -193,7 +193,7 @@ export default defineComponent({
           }
           else {
             holdingFeedbackDialog.value = true;
-            console.log("Your feedback has already been recorded. Please come after sometimes.")
+            // console.log("Your feedback has already been recorded. Please come after sometimes.")
           }
           
         }
