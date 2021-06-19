@@ -185,7 +185,7 @@ export default defineComponent({
 
     const finalSubmit = (event) => {
       // console.log(detailedSadReview.value.length)
-      if (detailedSadReview.value.length) {
+      if (detailedSadReview.value.trim().length) {
         api
           .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedSadReview.value.trim(), followUp: followUp.value })
           .then(response => {
@@ -219,7 +219,8 @@ export default defineComponent({
     }
 
     const onSave = () => {
-      if (detailedGoodReview.value.length) {
+      // console.log(detailedGoodReview.value.length)
+      if (detailedGoodReview.value.trim().length) {
         api
           .put('/feedbacks/' + $route.query.feedbackId, { extraInfo: detailedGoodReview.value.trim() })
           .then(response => {
