@@ -215,17 +215,17 @@ export default defineComponent({
     }
 
     // Testing code for Web Push Notification
-    const enableNotification = () => {
-      const subscriptionId = ref(localStorage.getItem("pushSubscriptionId"))
-      api
-        .get('/notification-subscription/' + subscriptionId.value)
-        .then(response => {
-          console.log("response, notifier: ", response)
-        })
-        .catch(error => {
-          console.error(error)
-        })
-    }
+    // const enableNotification = () => {
+    //   const subscriptionId = ref(localStorage.getItem("pushSubscriptionId"))
+    //   api
+    //     .get('/notifier/' + subscriptionId.value)
+    //     .then(response => {
+    //       console.log("response, notifier: ", response)
+    //     })
+    //     .catch(error => {
+    //       console.error(error)
+    //     })
+    // }
     // End of testing code for Web Push Notification
 
     return {
