@@ -5,32 +5,48 @@ import { Notify } from 'quasar'
 // events passes a ServiceWorkerRegistration instance in their arguments.
 // ServiceWorkerRegistration: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration
 
+const channel = new BroadcastChannel('pushSubscribe')
+
 register(process.env.SERVICE_WORKER_FILE, {
   // The registrationOptions object will be passed as the second argument
   // to ServiceWorkerContainer.register()
   // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register#Parameter
 
-  // registrationOptions: { scope: './' },
+  registrationOptions: { scope: '/src-pwa' },
 
-  ready (/* registration */) {
-    // console.log('Service worker is active.')
+  ready(/*registration*/) {
   },
 
-  registered (/* registration */) {
-    // console.log('Service worker has been registered.')
+  registered(registration) {
+    console.log('Service worker has been registered.')
+
+    channel.onmessage = (event) => {
+      localStorage.setItem("pushSubscriptionId", event.data.subscription._id)
+    }
+    // const requestNotificationPermission = async () => {
+    //   const permission = await window.Notification.requestPermission()
+    //   // value of permission can be 'granted', 'default', 'denied'
+    //   // granted: user has accepted the request
+    //   // default: user has dismissed the notification permission popup by clicking on x
+    //   // denied: user has denied the request.
+    //   if (permission !== 'granted') {
+    //     throw new Error('Permission not granted for Notification')
+    //   }
+    // }
+    // const permission = requestNotificationPermission()
   },
 
-  cached (/* registration */) {
+  cached(/* registration */) {
     // console.log('Content has been cached for offline use.')
   },
 
-  updatefound (/* registration */) {
+  updatefound(/* registration */) {
     // console.log('New content is downloading.')
   },
 
-  updated (/* registration */) {
+  updated(/* registration */) {
     // console.log('New content is available; please refresh.')
-    
+
     Notify.create({
       message: 'Update is available. Please refresh.',
       color: 'white',
@@ -47,11 +63,11 @@ register(process.env.SERVICE_WORKER_FILE, {
     })
   },
 
-  offline () {
+  offline() {
     // console.log('No internet connection found. App is running in offline mode.')
   },
 
-  error (/* err */) {
+  error(/* err */) {
     // console.error('Error during service worker registration:', err)
   }
 })

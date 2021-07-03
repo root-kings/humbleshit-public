@@ -57,6 +57,15 @@
               </q-card>
             
           </div>
+          <!-- <q-btn
+            rounded
+            class="full-width"
+            color="primary"
+            label="Submit"
+            icon="check"
+            @click="enableNotification"
+          /> -->
+
         </q-form>
     </q-card-section>
     <q-dialog v-model="holdingFeedbackDialog" position="bottom">
@@ -205,6 +214,20 @@ export default defineComponent({
       holdingFeedbackDialog.value = false;
     }
 
+    // Testing code for Web Push Notification
+    const enableNotification = () => {
+      const subscriptionId = ref(localStorage.getItem("pushSubscriptionId"))
+      api
+        .get('/notification-subscription/' + subscriptionId.value)
+        .then(response => {
+          console.log("response, notifier: ", response)
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    }
+    // End of testing code for Web Push Notification
+
     return {
         userFeedbackObj,
         userTypeList,
@@ -215,6 +238,7 @@ export default defineComponent({
         holdingFeedbackDialog,
         onClose,
         getUserFeedback,
+        enableNotification,
     }
   }
 })
