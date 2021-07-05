@@ -23,6 +23,20 @@ register(process.env.SERVICE_WORKER_FILE, {
     channel.onmessage = (event) => {
       localStorage.setItem("pushSubscriptionId", event.data.subscription._id)
     }
+
+    const getNotification = () => {
+      const subscriptionId = localStorage.getItem("pushSubscriptionId")
+      const SERVER_URL = 'http://localhost:3000/api/notifier/' + subscriptionId
+      const response = fetch(SERVER_URL, {
+        method: 'get',
+        headers: {
+          Accept: 'application/json',
+        },
+      })
+      console.log("response, notifier: ", response)    
+    }
+    getNotification()
+
     // const requestNotificationPermission = async () => {
     //   const permission = await window.Notification.requestPermission()
     //   // value of permission can be 'granted', 'default', 'denied'

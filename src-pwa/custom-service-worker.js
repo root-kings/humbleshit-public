@@ -58,7 +58,7 @@ self.addEventListener('activate', async () => {
 
 self.addEventListener('push', function (event) {
   if (event.data) {
-    showLocalNotification('Yolo', event.data.text(), self.registration)
+    showLocalNotification('humbleShit', event.data.text(), self.registration)
   } else {
     console.log('Push event but no data')
   }
@@ -66,7 +66,15 @@ self.addEventListener('push', function (event) {
 
 const showLocalNotification = (title, body, swRegistration) => {
   const options = {
-    body,
+    body: "Welcome!",
+    icon: "https://pics.freeicons.io/uploads/icons/png/2674342741552644384-512.png",
+    actions: [
+      {
+        action: 'coffee-action',
+        title: 'Coffee',
+        icon: '/images/demos/action-1-128x128.png'
+      },
+    ]
   }
   swRegistration.showNotification(title, options)
 }
